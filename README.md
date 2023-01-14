@@ -126,7 +126,7 @@ a2enmod proxy proxy_html proxy_http proxy_http2 ssl
 ```
 AllowEncodedSlashes On
 ```
-然后在反代到web服务那一块，ProxyPass和ProxyPassReverse这两个选项最后面加nocanno\
+然后在反代到web服务那一块，ProxyPass和ProxyPassReverse这两个选项最后面加nocanno
 >如果你把我上面的配置复制走了，那就不用加，我已经帮你加好了。
 #### v2ray服务配置
 由于Apache已经代理了TLS，并且指定了ws协议，**所以v2ray不能再启用TLS且协议必须是ws**。\
