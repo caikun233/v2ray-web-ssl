@@ -45,27 +45,27 @@ vim 001-web+v2.conf
 依照Apache的配置规则写一个配置，这里展示一下我自己的最终配置，地址、端口等信息已经抹除。（该配置适用于已经有独立的Web服务的情况下，比如cloudreve）
 ```conf
 <VirtualHost *:443>
-SSLEngine on
-SSLCertificateFile "（证书文件（最好是完整证书链））"
-SSLCertificateKeyFile "（私钥文件）"
-#ServerAdmin （电子邮件地址，可加可不加，也可以直接注释掉）
+	SSLEngine on
+	SSLCertificateFile "（证书文件（最好是完整证书链））"
+	SSLCertificateKeyFile "（私钥文件）"
+	#ServerAdmin （电子邮件地址，可加可不加，也可以直接注释掉）
 #这里开始是反代一个虚拟路径到v2ray服务端
-ProxyPass "（你想要的ws路径）" "ws://127.0.0.1:[v2ray服务端口]/[v2ray服务端的ws路径]" 
-ProxyRequests off
-ProxyAddHeaders Off
-ProxyPreserveHost On
-RequestHeader append X-Forwarded-For %{REMOTE_ADDR}s
-AllowEncodedSlashes On
+	ProxyPass "（你想要的ws路径）" "ws://127.0.0.1:[v2ray服务端口]/[v2ray服务端的ws路径]" 
+	ProxyRequests off
+	ProxyAddHeaders Off
+	ProxyPreserveHost On
+	RequestHeader append X-Forwarded-For %{REMOTE_ADDR}s
+	AllowEncodedSlashes On
 #反代到v2ray结束
 #反代到你的web服务开始
-<Proxy />
-Order deny,allow
-Allow from all
-</Proxy>
-ProxyPass / "http://127.0.0.1:80/" nocanno
-ProxyPassReverse / "http://127.0.0.1:80/"  nocanno
-	#反代到你web服务结束
-ErrorLog ${APACHE_LOG_DIR}/error.log #错误日志路径
+	<Proxy />
+		Order deny,allow
+		Allow from all
+	</Proxy>
+	ProxyPass / "http://127.0.0.1:80/" nocanno
+	ProxyPassReverse / "http://127.0.0.1:80/"  nocanno
+#反代到你web服务结束
+	ErrorLog ${APACHE_LOG_DIR}/error.log #错误日志路径
 		CustomLog ${APACHE_LOG_DIR}/access.log combined #日志路径
 </VirtualHost>
 ```
@@ -120,7 +120,15 @@ a2enmod proxy proxy_html proxy_http proxy_http2 ssl
 ##### 问题2：python版本
 在kali测试环境下，预装python3.10。在python3下是可以像上面<location>那样多行写的。\
 但是上线环境是python2，只能用文档开始的ProxyPass方法一行写完，不然报错无法启动。把upgrade=WebSocket删掉后Apache可以启动，但是不代理。
+##### 问题3：URL字符编码
+因为我是已有的Web服务，所以Apache在转发的时候会把我想要访问Web服务的URL编码一次。可是我的浏览器已经编码过了，所以我们需要在Apache配置中禁止它再次编译
 #### v2ray服务配置
+在反代web服务之前添加一行
+```
+AllowEncodedSlashes On
+```
+在反代到web服务那一块，ProxyPass和ProxyPassReverse这两个选项最后面加nocanno\
+如果你把我上面的配置复制走了，那就不用加，我已经帮你加好了。
 由于Apache已经代理了TLS，并且指定了ws协议，**所以v2ray不能再启用TLS且协议必须是ws**。\
 上文配置中，把ws协议反代到了127.0.0.1:[v2ray服务端口]\
 **相应的v2ray也必须监听127.0.0.1:[v2ray服务端口]，不能是0.0.0.0或其他地址**
