@@ -164,5 +164,3 @@ SSLCipherSuite ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-E
 这样可以开启可以使用加密方式白名单
 
 ##### 任务完成
-我是真的喜欢钱，所以喜欢的大伙可以往下面这个USDT-TRC20钱包地址转点USDT（不支持DEX、BSC、HECO的转币）\
-TJnbVK1pGZPULNd2JsrwaArbYhFd286UXH
